@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Globe</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            display:block;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.3);
+            font-size: 0.9rem;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="info">An Interactive 3D Globe | Drag to rotate, scroll to zoom</div>
+
+    <!-- Three.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for mouse interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // --- SCENE SETUP ---
+        // Create the main scene
+        const scene = new THREE.Scene();
+
+        // Create a camera to view the scene
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 15;
+
+        // Create the WebGL renderer and attach it to the DOM
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio); // Adjust for high-DPI screens
+        document.body.appendChild(renderer.domElement);
+
+        // --- LIGHTING ---
+        // Add ambient light for general illumination
+        const ambientLight = new THREE.AmbientLight(0x404040, 2); // soft white light
+        scene.add(ambientLight);
+
+        // Add a directional light to simulate the sun
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        directionalLight.position.set(5, 3, 5);
+        scene.add(directionalLight);
+
+        // --- GLOBE OBJECT ---
+        // Create the sphere geometry
+        const sphereGeometry = new THREE.SphereGeometry(5, 64, 64); // (radius, widthSegments, heightSegments)
+
+        // Load the Earth texture
+        const textureLoader = new THREE.TextureLoader();
+        const earthTexture = textureLoader.load(
+            'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/land_ocean_ice_cloud_2048.jpg',
+            () => { // This function is called on successful load
+                animate(); // Start the animation loop only after the texture has loaded
+            },
+            undefined, // onProgress callback function (not used here)
+            (err) => { // This function is called on error
+                console.error('An error happened while loading the texture.', err);
+                // In case of texture loading failure, create a basic material to show the sphere
+                const fallbackMaterial = new THREE.MeshPhongMaterial({ color: 0x2196f3, shininess: 50 });
+                globe.material = fallbackMaterial;
+                animate(); // Still start animation
+            }
+        );
+
+        // Create the material with the texture
+        const sphereMaterial = new THREE.MeshPhongMaterial({
+            map: earthTexture,
+            shininess: 50 // Controls the specular highlight shininess
+        });
+
+        // Create the final globe mesh by combining geometry and material
+        const globe = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        scene.add(globe);
+
+        // --- STARFIELD ---
+        // Create a starfield background
+        const starVertices = [];
+        for (let i = 0; i < 10000; i++) {
+            const x = THREE.MathUtils.randFloatSpread(2000); // Spread stars across a large cube
+            const y = THREE.MathUtils.randFloatSpread(2000);
+            const z = THREE.MathUtils.randFloatSpread(2000);
+            starVertices.push(x, y, z);
+        }
+        const starGeometry = new THREE.BufferGeometry();
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+
+
+        // --- CONTROLS ---
+        // Add OrbitControls to allow the user to interact with the scene
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 8; // Don't let the user zoom in too close
+        controls.maxDistance = 50; // Don't let the user zoom out too far
+
+        // --- ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the globe for a continuous spinning effect
+            globe.rotation.y += 0.0005;
+
+            // Update the controls
+            controls.update();
+
+            // Render the scene from the perspective of the camera
+            renderer.render(scene, camera);
+        }
+        
+        // --- RESIZE HANDLER ---
+        // Make the scene responsive to window resizing
+        window.addEventListener('resize', () => {
+            // Update camera aspect ratio
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            // Update renderer size
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }, false);
+
+    </script>
+</body>
+</html>

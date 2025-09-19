@@ -146,7 +146,19 @@ function Results() {
 
   const tips = generateStaticTips();
 
-  return <ResultsContent score={totalScore} category={category} badge={badge} tips={tips} community={community} />;
+  return <ResultsContent 
+    score={totalScore} 
+    category={category} 
+    badge={badge} 
+    tips={tips} 
+    community={community}
+    energyScore={energyScore}
+    transportScore={transportScore}
+    dietScore={dietScore}
+    habitsScore={habitsScore}
+    wasteScore={wasteScore}
+    homeScore={homeScore}
+  />;
 }
 
 export default function ResultsPage() {

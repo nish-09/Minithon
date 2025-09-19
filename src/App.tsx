@@ -7,7 +7,7 @@ import Results from './pages/Results'
 
 function App() {
   return (
-    <div className={cn("font-body antialiased", "min-h-screen bg-background font-sans")}>
+    <div className={cn("font-body antialiased", "min-h-screen font-sans relative")}>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />

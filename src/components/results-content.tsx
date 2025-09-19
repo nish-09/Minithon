@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import ScoreGauge from "./score-gauge";
 import CarbonMolecule3D from "./carbon-molecule-3d";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Award, Bike, Bot, CheckCircle, Info, Leaf, MessageSquare, Share2, Users } from "lucide-react";
+import { Award, Bike, Bot, CheckCircle, Info, Leaf, MessageSquare, Share2, Users, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { BadgeInfo, CommunityMember } from "@/pages/Results";
 import { cn } from "@/lib/utils";
+import ResultsCharts from "./results-charts";
 
 type ResultsContentProps = {
   score: number;
@@ -19,6 +21,12 @@ type ResultsContentProps = {
   badge: BadgeInfo;
   tips: string[];
   community: CommunityMember[];
+  energyScore: number;
+  transportScore: number;
+  dietScore: number;
+  habitsScore: number;
+  wasteScore: number;
+  homeScore: number;
 };
 
 const cardVariants = {
@@ -33,13 +41,30 @@ const cardVariants = {
   }),
 };
 
-export default function ResultsContent({ score, category, badge, tips, community }: ResultsContentProps) {
+export default function ResultsContent({ 
+  score, 
+  category, 
+  badge, 
+  tips, 
+  community,
+  energyScore,
+  transportScore,
+  dietScore,
+  habitsScore,
+  wasteScore,
+  homeScore
+}: ResultsContentProps) {
   const [isMoleculeInfoOpen, setMoleculeInfoOpen] = useState(false);
   const [isBadgePopupOpen, setBadgePopupOpen] = useState(false);
   const [isShareCardOpen, setShareCardOpen] = useState(false);
   const [selectedTip, setSelectedTip] = useState<number | null>(null);
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleGoHome = () => {
+    navigate('/');
+  };
 
   // Calculate detailed metrics
   const getFootprintLevel = (score: number) => {
@@ -88,6 +113,17 @@ export default function ResultsContent({ score, category, badge, tips, community
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
+          <div className="flex justify-between items-center mb-8">
+            <Button
+              variant="outline"
+              onClick={handleGoHome}
+              className="flex items-center gap-2 hover:bg-primary/10"
+            >
+              <Home className="w-4 h-4" />
+              Go Home
+            </Button>
+            <div className="flex-1"></div>
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Your Carbon Footprint Results</h1>
           <p className="text-muted-foreground mt-3 text-lg max-w-2xl mx-auto">
             Your environmental impact score is <span className={`font-semibold ${footprintLevel.color}`}>{score}/100</span>. 
@@ -102,19 +138,19 @@ export default function ResultsContent({ score, category, badge, tips, community
           transition={{ delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
         >
-          <Card className="text-center p-6">
+          <Card className="text-center p-6 glass-card shadow-lg">
             <div className="text-3xl font-bold text-primary mb-2">{co2Equivalent}</div>
             <div className="text-sm text-muted-foreground">Tons CO₂/year</div>
           </Card>
-          <Card className="text-center p-6">
+          <Card className="text-center p-6 glass-card shadow-lg">
             <div className="text-3xl font-bold text-green-600 mb-2">{treesNeeded}</div>
             <div className="text-sm text-muted-foreground">Trees to offset</div>
           </Card>
-          <Card className="text-center p-6">
+          <Card className="text-center p-6 glass-card shadow-lg">
             <div className="text-3xl font-bold text-blue-600 mb-2">{earthsNeeded}</div>
             <div className="text-sm text-muted-foreground">Earths needed</div>
           </Card>
-          <Card className="text-center p-6">
+          <Card className="text-center p-6 glass-card shadow-lg">
             <div className={`text-3xl font-bold mb-2 ${footprintLevel.color}`}>{footprintLevel.level}</div>
             <div className="text-sm text-muted-foreground">Impact Level</div>
           </Card>
@@ -192,7 +228,7 @@ export default function ResultsContent({ score, category, badge, tips, community
 
             {/* Detailed Analysis Section */}
             <motion.div custom={3} variants={cardVariants} initial="hidden" animate="visible">
-              <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <Card className="glass-card shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Info className="text-primary" />
@@ -244,8 +280,21 @@ export default function ResultsContent({ score, category, badge, tips, community
               </Card>
             </motion.div>
 
-             <motion.div custom={4} variants={cardVariants} initial="hidden" animate="visible">
-                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            {/* Interactive Charts Section */}
+            <motion.div custom={4} variants={cardVariants} initial="hidden" animate="visible">
+              <ResultsCharts
+                energyScore={energyScore}
+                transportScore={transportScore}
+                dietScore={dietScore}
+                habitsScore={habitsScore}
+                wasteScore={wasteScore}
+                homeScore={homeScore}
+                totalScore={score}
+              />
+            </motion.div>
+
+             <motion.div custom={5} variants={cardVariants} initial="hidden" animate="visible">
+                <Card className="glass-card shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3"><Users /> Community Hub</CardTitle>
                     <CardDescription>Connect with others who have a similar eco-score ({Math.round(scoreReversed-5)} - {Math.round(scoreReversed+5)}).</CardDescription>

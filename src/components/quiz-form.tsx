@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Info, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
+import { Info, CheckCircle, AlertCircle, TrendingUp, Home, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -111,6 +111,16 @@ export default function QuizForm() {
     }
   };
 
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   const handleSelect = (answer: Answer) => {
     const newAnswers = [...answers];
     newAnswers[currentStep] = answer;
@@ -120,14 +130,6 @@ export default function QuizForm() {
     if (Math.random() > 0.3) {
       toast({ description: randomToast, duration: 2000 });
     }
-
-    setTimeout(() => {
-      if (currentStep < quizData.length - 1) {
-        handleNext();
-      } else {
-        handleSubmit(newAnswers);
-      }
-    }, 300);
   };
   
   const openInfoPopup = (title: string, description: string) => {
@@ -273,7 +275,7 @@ export default function QuizForm() {
           exit={{ opacity: 0, y: -50 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="overflow-hidden shadow-lg bg-card/80 backdrop-blur-sm">
+          <Card className="overflow-hidden shadow-lg glass-card">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
@@ -351,6 +353,56 @@ export default function QuizForm() {
           </Card>
         </motion.div>
       </AnimatePresence>
+
+      {/* Navigation Buttons */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="flex justify-between items-center mt-8 px-4"
+      >
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={handleGoHome}
+            className="flex items-center gap-2"
+          >
+            <Home className="w-4 h-4" />
+            Go Home
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+        </div>
+
+        <div className="flex gap-3">
+          {currentStep === quizData.length - 1 ? (
+            <Button
+              onClick={() => handleSubmit(answers)}
+              disabled={answers[currentStep] === null}
+              className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+            >
+              See Results
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleNext}
+              disabled={answers[currentStep] === null}
+              className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+      </motion.div>
 
       <Dialog open={isInfoPopupOpen} onOpenChange={setInfoPopupOpen}>
         <DialogContent>
