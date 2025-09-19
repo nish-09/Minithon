@@ -36,9 +36,9 @@ export default function LandingContent() {
   }, []);
   
   // Typing effects for climate stats
-  const tempRise = useCountUpFloatEffect(1.1, 3000, 0, 1);
+  const tempRise = useCountUpFloatEffect(1.1, 4000, 0, 1);
   const co2Increase = useCountUpEffect(50, 3000, 0);
-  const { displayedText: netZeroTarget, isComplete: netZeroComplete } = useTypingEffect("2050", 150, statsInView);
+  const { displayedText: netZeroTarget, isComplete: netZeroComplete } = useTypingEffect("2050", 200, statsInView);
   const parisGoal = useCountUpFloatEffect(1.5, 3000, 0, 1);
   
   // Counting effects for emission percentages
@@ -299,49 +299,54 @@ export default function LandingContent() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {[
-              {
-                icon: <Zap className="w-12 h-12 text-blue-500 mb-4" />,
-                title: "Electricity & Heat",
-                percentage: `${electricityPercent}%`,
-                description: "Power generation and heating systems are the largest source of global emissions."
-              },
-              {
-                icon: <Car className="w-12 h-12 text-red-500 mb-4" />,
-                title: "Transportation",
-                percentage: `${transportPercent}%`,
-                description: "Cars, trucks, ships, and planes contribute significantly to global emissions."
-              },
-              {
-                icon: <Home className="w-12 h-12 text-green-500 mb-4" />,
-                title: "Buildings",
-                percentage: `${buildingsPercent}%`,
-                description: "Heating, cooling, and powering buildings accounts for a substantial portion."
-              },
-              {
-                icon: <Leaf className="w-12 h-12 text-orange-500 mb-4" />,
-                title: "Agriculture",
-                percentage: `${agriculturePercent}%`,
-                description: "Food production, livestock, and land use changes drive agricultural emissions."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={item.title}
-                variants={{
-                  hidden: { opacity: 0, y: 50 },
-                  visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: index * 0.1 } }
-                }}
-                className="text-center p-6 rounded-lg bg-transparent border border-white/20 hover:shadow-lg transition-shadow"
-              >
-                {item.icon}
-                <div className="text-3xl font-bold text-primary mb-2 transition-all duration-300 hover:scale-110">
-                  {item.percentage}
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
-                <p className="text-white/80 text-sm">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
+  {[
+    {
+      icon: <Zap className="w-12 h-12 text-blue-500 mb-4" />,
+      title: "Electricity & Heat",
+      percentage: `${electricityPercent}%`,
+      color: "text-yellow-400",
+      description: "Power generation and heating systems are the largest source of global emissions."
+    },
+    {
+      icon: <Car className="w-12 h-12 text-red-500 mb-4" />,
+      title: "Transportation",
+      percentage: `${transportPercent}%`,
+      color: "text-red-400",
+      description: "Cars, trucks, ships, and planes contribute significantly to global emissions."
+    },
+    {
+      icon: <Home className="w-12 h-12 text-green-500 mb-4" />,
+      title: "Buildings",
+      percentage: `${buildingsPercent}%`,
+      color: "text-green-400",
+      description: "Heating, cooling, and powering buildings accounts for a substantial portion."
+    },
+    {
+      icon: <Leaf className="w-12 h-12 text-orange-500 mb-4" />,
+      title: "Agriculture",
+      percentage: `${agriculturePercent}%`,
+      color: "text-orange-400",
+      description: "Food production, livestock, and land use changes drive agricultural emissions."
+    }
+  ].map((item, index) => (
+    <motion.div
+      key={item.title}
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: index * 0.1 } }
+      }}
+      className="text-center p-6 rounded-lg bg-transparent border border-white/20 hover:shadow-lg transition-shadow"
+    >
+      {item.icon}
+      <div className={`text-3xl font-bold mb-2 transition-all duration-300 hover:scale-110 ${item.color}`}>
+        {item.percentage}
+      </div>
+      <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+      <p className="text-white/80 text-sm">{item.description}</p>
+    </motion.div>
+  ))}
+</div>
+
         </div>
       </motion.section>
 

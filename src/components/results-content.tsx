@@ -65,7 +65,7 @@ export default function ResultsContent({
 
   // Calculate detailed metrics
   const getFootprintLevel = (score: number) => {
-    if (score <= 20) return { level: "Excellent", color: "text-green-600", bgColor: "bg-green-100", description: "You're doing amazing! Keep up the great work." };
+    if (score <= 20) return { level: "Excellent", color: "text-sky-600", bgColor: "bg-green-100", description: "You're doing amazing! Keep up the great work." };
     if (score <= 40) return { level: "Good", color: "text-blue-600", bgColor: "bg-blue-100", description: "You're on the right track with some room for improvement." };
     if (score <= 60) return { level: "Fair", color: "text-yellow-600", bgColor: "bg-yellow-100", description: "There's significant potential to reduce your impact." };
     if (score <= 80) return { level: "Poor", color: "text-orange-600", bgColor: "bg-orange-100", description: "Your footprint is above average - time for action!" };

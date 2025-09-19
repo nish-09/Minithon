@@ -15,10 +15,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Info, CheckCircle, AlertCircle, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Info,
+  CheckCircle,
+  AlertCircle,
+  TrendingUp,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-
 
 const toastMessages = [
   "Great choice! Every small step counts 🌍.",
@@ -45,7 +51,6 @@ export default function QuizForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Calculate real-time footprint
   useEffect(() => {
     const scores = {
       energy: 0,
@@ -61,27 +66,27 @@ export default function QuizForm() {
       if (answer) {
         const category = quizData[index].category;
         switch (category) {
-          case 'Energy':
+          case "Energy":
             scores.energy += answer.score;
             counts.energy++;
             break;
-          case 'Transport':
+          case "Transport":
             scores.transport += answer.score;
             counts.transport++;
             break;
-          case 'Diet':
+          case "Diet":
             scores.diet += answer.score;
             counts.diet++;
             break;
-          case 'Daily Habits':
+          case "Daily Habits":
             scores.habits += answer.score;
             counts.habits++;
             break;
-          case 'Waste Management':
+          case "Waste Management":
             scores.waste += answer.score;
             counts.waste++;
             break;
-          case 'Home & Possessions':
+          case "Home & Possessions":
             scores.home += answer.score;
             counts.home++;
             break;
@@ -89,7 +94,6 @@ export default function QuizForm() {
       }
     });
 
-    // Calculate averages
     const avgScores = {
       energy: counts.energy > 0 ? scores.energy / counts.energy : 0,
       transport: counts.transport > 0 ? scores.transport / counts.transport : 0,
@@ -100,7 +104,7 @@ export default function QuizForm() {
     };
 
     setCategoryScores(avgScores);
-    
+
     const totalScore = Object.values(avgScores).reduce((sum, score) => sum + score, 0) / 6;
     setCurrentFootprint(Math.round(totalScore));
   }, [answers]);
@@ -108,19 +112,16 @@ export default function QuizForm() {
   const handleNext = () => {
     if (currentStep < quizData.length - 1) {
       setCurrentStep(currentStep + 1);
-      // Scroll to top when moving to next question
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      // Scroll to top when moving to previous question
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
-
 
   const handleSelect = (answer: Answer) => {
     const newAnswers = [...answers];
@@ -132,7 +133,7 @@ export default function QuizForm() {
       toast({ description: randomToast, duration: 2000 });
     }
   };
-  
+
   const openInfoPopup = (title: string, description: string) => {
     setPopupContent({ title, description });
     setInfoPopupOpen(true);
@@ -153,27 +154,27 @@ export default function QuizForm() {
       if (answer) {
         const category = quizData[index].category;
         switch (category) {
-          case 'Energy':
+          case "Energy":
             scores.energy += answer.score;
             counts.energy++;
             break;
-          case 'Transport':
+          case "Transport":
             scores.transport += answer.score;
             counts.transport++;
             break;
-          case 'Diet':
+          case "Diet":
             scores.diet += answer.score;
             counts.diet++;
             break;
-          case 'Daily Habits':
+          case "Daily Habits":
             scores.habits += answer.score;
             counts.habits++;
             break;
-          case 'Waste Management':
+          case "Waste Management":
             scores.waste += answer.score;
             counts.waste++;
             break;
-          case 'Home & Possessions':
+          case "Home & Possessions":
             scores.home += answer.score;
             counts.home++;
             break;
@@ -182,12 +183,12 @@ export default function QuizForm() {
     });
 
     const avgScores = {
-        energy: counts.energy > 0 ? Math.round((scores.energy / (counts.energy * 10)) * 100) : 0,
-        transport: counts.transport > 0 ? Math.round((scores.transport / (counts.transport * 10)) * 100) : 0,
-        diet: counts.diet > 0 ? Math.round((scores.diet / (counts.diet * 10)) * 100) : 0,
-        habits: counts.habits > 0 ? Math.round((scores.habits / (counts.habits * 10)) * 100) : 0,
-        waste: counts.waste > 0 ? Math.round((scores.waste / (counts.waste * 10)) * 100) : 0,
-        home: counts.home > 0 ? Math.round((scores.home / (counts.home * 10)) * 100) : 0,
+      energy: counts.energy > 0 ? Math.round((scores.energy / (counts.energy * 10)) * 100) : 0,
+      transport: counts.transport > 0 ? Math.round((scores.transport / (counts.transport * 10)) * 100) : 0,
+      diet: counts.diet > 0 ? Math.round((scores.diet / (counts.diet * 10)) * 100) : 0,
+      habits: counts.habits > 0 ? Math.round((scores.habits / (counts.habits * 10)) * 100) : 0,
+      waste: counts.waste > 0 ? Math.round((scores.waste / (counts.waste * 10)) * 100) : 0,
+      home: counts.home > 0 ? Math.round((scores.home / (counts.home * 10)) * 100) : 0,
     };
 
     const query = new URLSearchParams({
@@ -198,23 +199,26 @@ export default function QuizForm() {
       wasteScore: avgScores.waste.toString(),
       homeScore: avgScores.home.toString(),
     }).toString();
-    
-      navigate(`/results?${query}`);
+
+    navigate(`/results?${query}`);
   };
 
   const progress = ((currentStep + 1) / quizData.length) * 100;
   const currentQuestion = quizData[currentStep];
-  const answeredQuestions = answers.filter(answer => answer !== null).length;
-  
+  const selectedAnswer = answers[currentStep];
+  const answeredQuestions = answers.filter((answer) => answer !== null).length;
+
+ 
+
   // Get footprint level and color
   const getFootprintLevel = (score: number) => {
-    if (score <= 20) return { level: "Excellent", color: "text-green-600", bgColor: "bg-green-100" };
+    if (score <= 20) return { level: "Excellent", color: "text-sky-600", bgColor: "bg-green-100" };
     if (score <= 40) return { level: "Good", color: "text-blue-600", bgColor: "bg-blue-100" };
     if (score <= 60) return { level: "Fair", color: "text-yellow-600", bgColor: "bg-yellow-100" };
     if (score <= 80) return { level: "Poor", color: "text-orange-600", bgColor: "bg-orange-100" };
     return { level: "Very Poor", color: "text-red-600", bgColor: "bg-red-100" };
   };
-
+  
   const footprintLevel = getFootprintLevel(currentFootprint);
   
   return (
@@ -312,7 +316,7 @@ export default function QuizForm() {
                           "bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50",
                           "hover:border-primary/50 hover:bg-white/60 dark:hover:bg-slate-800/60 hover:shadow-xl hover:scale-[1.03] hover:-translate-y-1",
                           "has-[:checked]:border-primary has-[:checked]:bg-white/55 dark:has-[:checked]:bg-slate-800/55 has-[:checked]:shadow-xl has-[:checked]:scale-[1.03] has-[:checked]:-translate-y-1",
-                          isLowImpact && "hover:border-green-500/50 hover:bg-green-50/70 dark:hover:bg-green-900/20 has-[:checked]:border-green-500 has-[:checked]:bg-green-50/60 dark:has-[:checked]:bg-green-900/15",
+                          isLowImpact && "hover:border-blue-500/50 hover:bg-blue-50/70 dark:hover:bg-blue-900/20 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50/60 dark:has-[:checked]:bg-blue-900/15",
                           isHighImpact && "hover:border-red-500/50 hover:bg-red-50/70 dark:hover:bg-red-900/20 has-[:checked]:border-red-500 has-[:checked]:bg-red-50/60 dark:has-[:checked]:bg-red-900/15"
                         )}
                       >
@@ -321,7 +325,7 @@ export default function QuizForm() {
                             {answer.text}
                           </span>
                           <div className="flex items-center gap-2">
-                            {isLowImpact && <CheckCircle className="w-5 h-5 text-green-600" />}
+                            {isLowImpact && <CheckCircle className="w-5 h-5 text-blue-600" />}
                             {isHighImpact && <AlertCircle className="w-5 h-5 text-red-600" />}
                             {answer.score > 3 && answer.score < 7 && <TrendingUp className="w-5 h-5 text-yellow-600" />}
                           </div>

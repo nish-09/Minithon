@@ -37,6 +37,12 @@
   }
 }
 
+/* Improve default visibility of Lucide icons across the app */
+.lucide {
+  color: #ffffff; /* inherit to stroke via currentColor */
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background-image: url('/assets/images/bg.jpg');
