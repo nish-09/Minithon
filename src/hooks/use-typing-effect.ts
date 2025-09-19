@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 
-export function useTypingEffect(text: string, speed: number = 50) {
+export function useTypingEffect(text: string, speed: number = 50, enabled: boolean = true) {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
+    // Reset when disabled or when re-enabled
+    if (!enabled) {
+      setDisplayedText('');
+      setCurrentIndex(0);
+      setIsComplete(false);
+      return;
+    }
+
     if (currentIndex < text.length) {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + text[currentIndex]);
@@ -16,7 +24,7 @@ export function useTypingEffect(text: string, speed: number = 50) {
     } else {
       setIsComplete(true);
     }
-  }, [currentIndex, text, speed]);
+  }, [currentIndex, text, speed, enabled]);
 
   return { displayedText, isComplete };
 }
@@ -25,11 +33,11 @@ export function useCountUpEffect(end: number, duration: number = 2000, start: nu
   const [count, setCount] = useState(start);
 
   useEffect(() => {
-    let startTime: number;
+    let startTime: number | undefined;
     let animationFrame: number;
 
     const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
+      if (startTime === undefined) startTime = currentTime;
       const progress = Math.min((currentTime - startTime) / duration, 1);
       
       // Easing function for smooth animation
@@ -59,11 +67,11 @@ export function useCountUpFloatEffect(end: number, duration: number = 2000, star
   const [count, setCount] = useState(start);
 
   useEffect(() => {
-    let startTime: number;
+    let startTime: number | undefined;
     let animationFrame: number;
 
     const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
+      if (startTime === undefined) startTime = currentTime;
       const progress = Math.min((currentTime - startTime) / duration, 1);
       
       // Easing function for smooth animation

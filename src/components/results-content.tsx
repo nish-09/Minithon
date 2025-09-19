@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Award, Bike, Bot, CheckCircle, Info, Leaf, MessageSquare, Share2, Users, Home } from "lucide-react";
+import { Award, Bike, Bot, CheckCircle, Info, Leaf, MessageSquare, Share2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { BadgeInfo, CommunityMember } from "@/pages/Results";
 import { cn } from "@/lib/utils";
@@ -62,9 +62,6 @@ export default function ResultsContent({
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleGoHome = () => {
-    navigate('/');
-  };
 
   // Calculate detailed metrics
   const getFootprintLevel = (score: number) => {
@@ -114,14 +111,6 @@ export default function ResultsContent({
           className="text-center mb-12"
         >
           <div className="flex justify-between items-center mb-8">
-            <Button
-              variant="outline"
-              onClick={handleGoHome}
-              className="flex items-center gap-2 hover:bg-primary/10"
-            >
-              <Home className="w-4 h-4" />
-              Go Home
-            </Button>
             <div className="flex-1"></div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Your Carbon Footprint Results</h1>
@@ -138,19 +127,19 @@ export default function ResultsContent({
           transition={{ delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
         >
-          <Card className="text-center p-6 glass-card shadow-lg">
+          <Card className="text-center p-6 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg">
             <div className="text-3xl font-bold text-primary mb-2">{co2Equivalent}</div>
             <div className="text-sm text-muted-foreground">Tons CO₂/year</div>
           </Card>
-          <Card className="text-center p-6 glass-card shadow-lg">
+          <Card className="text-center p-6 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg">
             <div className="text-3xl font-bold text-green-600 mb-2">{treesNeeded}</div>
             <div className="text-sm text-muted-foreground">Trees to offset</div>
           </Card>
-          <Card className="text-center p-6 glass-card shadow-lg">
+          <Card className="text-center p-6 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg">
             <div className="text-3xl font-bold text-blue-600 mb-2">{earthsNeeded}</div>
             <div className="text-sm text-muted-foreground">Earths needed</div>
           </Card>
-          <Card className="text-center p-6 glass-card shadow-lg">
+          <Card className="text-center p-6 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg">
             <div className={`text-3xl font-bold mb-2 ${footprintLevel.color}`}>{footprintLevel.level}</div>
             <div className="text-sm text-muted-foreground">Impact Level</div>
           </Card>
@@ -161,7 +150,7 @@ export default function ResultsContent({
           <div className="space-y-8 lg:col-span-2">
             <div className="grid md:grid-cols-2 gap-8">
                 <motion.div custom={1} variants={cardVariants} initial="hidden" animate="visible">
-                    <Card className="h-full flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <Card className="h-full flex flex-col items-center justify-center text-center bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <CardHeader>
                         <CardTitle className="text-2xl">Your Impact Score</CardTitle>
                         <CardDescription>Lower score is better!</CardDescription>
@@ -176,7 +165,7 @@ export default function ResultsContent({
                 </motion.div>
 
                 <motion.div custom={2} variants={cardVariants} initial="hidden" animate="visible">
-                    <Card className="h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <Card className="h-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                             <CheckCircle className="text-primary" /> Personalized Eco Tips
@@ -227,8 +216,8 @@ export default function ResultsContent({
             </div>
 
             {/* Detailed Analysis Section */}
-            <motion.div custom={3} variants={cardVariants} initial="hidden" animate="visible">
-              <Card className="glass-card shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <motion.div custom={3} variants={cardVariants} initial="hidden" animate="visible" className="flex justify-center w-full">
+              <Card className="w-full max-w-5xl mx-auto bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Info className="text-primary" />
@@ -247,19 +236,19 @@ export default function ResultsContent({
                   </CardDescription>
                 </CardHeader>
                 {showDetailedAnalysis && (
-                  <CardContent className="p-6">
-                    <div className="space-y-6">
+                  <CardContent className="p-8">
+                    <div className="space-y-8 text-center max-w-4xl mx-auto">
                       <div>
-                        <h4 className="font-semibold mb-3">What this means:</h4>
-                        <p className="text-muted-foreground text-sm leading-relaxed">
+                        <h4 className="font-semibold mb-4 text-lg">What this means:</h4>
+                        <p className="text-muted-foreground text-base leading-relaxed">
                           Your carbon footprint of {co2Equivalent} tons CO₂ per year means you would need {earthsNeeded} Earths 
                           if everyone lived like you. This is {score > 50 ? 'above' : 'below'} the global average of 4.8 tons per person.
                         </p>
                       </div>
                       
                       <div>
-                        <h4 className="font-semibold mb-3">How to improve:</h4>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
+                        <h4 className="font-semibold mb-4 text-lg">How to improve:</h4>
+                        <ul className="space-y-3 text-base text-muted-foreground text-left max-w-2xl mx-auto">
                           <li>• Focus on the highest-impact areas first (transport, energy, diet)</li>
                           <li>• Small changes can make a big difference over time</li>
                           <li>• Track your progress and celebrate improvements</li>
@@ -267,9 +256,9 @@ export default function ResultsContent({
                         </ul>
                       </div>
 
-                      <div className="bg-muted/50 p-4 rounded-lg">
-                        <h4 className="font-semibold mb-2 text-primary">Did you know?</h4>
-                        <p className="text-sm text-muted-foreground">
+                      <div className="bg-muted/50 p-6 rounded-lg max-w-3xl mx-auto">
+                        <h4 className="font-semibold mb-3 text-primary text-lg">Did you know?</h4>
+                        <p className="text-base text-muted-foreground">
                           If you reduce your footprint by just 20%, you could save {Math.round(co2Equivalent * 0.2)} tons of CO₂ annually - 
                           equivalent to planting {Math.round(treesNeeded * 0.2)} trees!
                         </p>
@@ -281,7 +270,7 @@ export default function ResultsContent({
             </motion.div>
 
             {/* Interactive Charts Section */}
-            <motion.div custom={4} variants={cardVariants} initial="hidden" animate="visible">
+            <motion.div custom={4} variants={cardVariants} initial="hidden" animate="visible" className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 rounded-xl shadow-lg">
               <ResultsCharts
                 energyScore={energyScore}
                 transportScore={transportScore}
@@ -294,7 +283,7 @@ export default function ResultsContent({
             </motion.div>
 
              <motion.div custom={5} variants={cardVariants} initial="hidden" animate="visible">
-                <Card className="glass-card shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <Card className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3"><Users /> Community Hub</CardTitle>
                     <CardDescription>Connect with others who have a similar eco-score ({Math.round(scoreReversed-5)} - {Math.round(scoreReversed+5)}).</CardDescription>
@@ -332,13 +321,12 @@ export default function ResultsContent({
           
           <div className="space-y-8">
              <motion.div custom={3} variants={cardVariants} initial="hidden" animate="visible">
-                <Card className="shadow-lg text-center relative h-60 hover:shadow-xl transition-shadow duration-300">
+                <Card className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg text-center relative h-60 hover:shadow-xl transition-shadow duration-300">
                   <CarbonMolecule3D onMoleculeClick={() => setMoleculeInfoOpen(true)} />
-                  <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-muted-foreground flex items-center gap-1"><Info size={14}/> Click the molecule for info</p>
                 </Card>
              </motion.div>
              <motion.div custom={5} variants={cardVariants} initial="hidden" animate="visible">
-                <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-center justify-center text-center">
+                <Card className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-center justify-center text-center">
                     <h3 className="text-xl font-bold mb-4">Share Your Progress!</h3>
                     <p className="text-muted-foreground mb-6">Inspire others by sharing your commitment to a greener planet.</p>
                     <Button size="lg" onClick={() => setShareCardOpen(true)}>

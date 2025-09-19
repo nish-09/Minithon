@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Info, CheckCircle, AlertCircle, TrendingUp, Home, ChevronLeft, ChevronRight } from "lucide-react";
+import { Info, CheckCircle, AlertCircle, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -108,18 +108,19 @@ export default function QuizForm() {
   const handleNext = () => {
     if (currentStep < quizData.length - 1) {
       setCurrentStep(currentStep + 1);
+      // Scroll to top when moving to next question
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top when moving to previous question
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const handleGoHome = () => {
-    navigate('/');
-  };
 
   const handleSelect = (answer: Answer) => {
     const newAnswers = [...answers];
@@ -222,22 +223,13 @@ export default function QuizForm() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Your Carbon Footprint</h1>
-            <p className="text-muted-foreground">Answer questions to discover your environmental impact</p>
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Your Carbon Footprint</h1>
+            <p className="text-slate-600 dark:text-slate-300">Answer questions to discover your environmental impact</p>
           </div>
-          {answeredQuestions > 0 && (
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className={`px-4 py-2 rounded-full ${footprintLevel.bgColor} ${footprintLevel.color} font-semibold`}
-            >
-              Current Score: {currentFootprint}/100
-            </motion.div>
-          )}
         </div>
         
         <Progress value={progress} className="h-3 mb-2" />
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
           <span>Question {currentStep + 1} of {quizData.length}</span>
           <span>{Math.round(progress)}% Complete</span>
         </div>
@@ -250,7 +242,7 @@ export default function QuizForm() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h3 className="text-lg font-semibold mb-4">Category Breakdown</h3>
+          <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-100">Category Breakdown</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {Object.entries(categoryScores).map(([category, score]) => {
               const level = getFootprintLevel(score);
@@ -258,7 +250,7 @@ export default function QuizForm() {
               return (
                 <div key={category} className="flex items-center space-x-2">
                   <div className={`w-3 h-3 rounded-full ${level.bgColor}`}></div>
-                  <span className="text-sm font-medium">{categoryName}</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{categoryName}</span>
                   <span className={`text-sm ${level.color}`}>{Math.round(score)}</span>
                 </div>
               );
@@ -275,13 +267,13 @@ export default function QuizForm() {
           exit={{ opacity: 0, y: -50 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="overflow-hidden shadow-lg glass-card">
+          <Card className="overflow-hidden shadow-lg bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50">
             <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="text-2xl">{currentQuestion.icon}</div>
                   <div>
-                    <CardTitle className="text-xl">{currentQuestion.category}</CardTitle>
+                    <CardTitle className="text-xl text-slate-800 dark:text-slate-100">{currentQuestion.category}</CardTitle>
                     {currentQuestion.subcategory && (
                       <Badge variant="secondary" className="mt-1">
                         {currentQuestion.subcategory}
@@ -295,7 +287,7 @@ export default function QuizForm() {
               </div>
             </CardHeader>
             <CardContent className="p-6">
-              <h2 className="text-2xl font-semibold mb-8 text-center leading-relaxed">{currentQuestion.question}</h2>
+              <h2 className="text-2xl font-semibold mb-8 text-center leading-relaxed text-slate-800 dark:text-slate-100">{currentQuestion.question}</h2>
               <RadioGroup
                 onValueChange={(value) => handleSelect(currentQuestion.answers.find(a => a.text === value)!)}
                 className="space-y-4"
@@ -317,14 +309,15 @@ export default function QuizForm() {
                         htmlFor={`q${currentStep}-a${index}`}
                         className={cn(
                           "flex flex-col items-start p-6 border-2 rounded-xl cursor-pointer transition-all duration-300 group",
-                          "hover:border-primary hover:bg-primary/5 hover:shadow-lg hover:scale-[1.02]",
-                          "has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:shadow-lg has-[:checked]:scale-[1.02]",
-                          isLowImpact && "hover:border-green-500 hover:bg-green-50 has-[:checked]:border-green-500 has-[:checked]:bg-green-50",
-                          isHighImpact && "hover:border-red-500 hover:bg-red-50 has-[:checked]:border-red-500 has-[:checked]:bg-red-50"
+                          "bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-white/20 dark:border-slate-700/50",
+                          "hover:border-primary/50 hover:bg-white/60 dark:hover:bg-slate-800/60 hover:shadow-xl hover:scale-[1.03] hover:-translate-y-1",
+                          "has-[:checked]:border-primary has-[:checked]:bg-white/55 dark:has-[:checked]:bg-slate-800/55 has-[:checked]:shadow-xl has-[:checked]:scale-[1.03] has-[:checked]:-translate-y-1",
+                          isLowImpact && "hover:border-green-500/50 hover:bg-green-50/70 dark:hover:bg-green-900/20 has-[:checked]:border-green-500 has-[:checked]:bg-green-50/60 dark:has-[:checked]:bg-green-900/15",
+                          isHighImpact && "hover:border-red-500/50 hover:bg-red-50/70 dark:hover:bg-red-900/20 has-[:checked]:border-red-500 has-[:checked]:bg-red-50/60 dark:has-[:checked]:bg-red-900/15"
                         )}
                       >
                         <div className="flex items-center justify-between w-full mb-2">
-                          <span className="text-lg font-medium group-hover:text-primary transition-colors">
+                          <span className="text-lg font-semibold text-slate-800 dark:text-slate-100 group-hover:text-primary dark:group-hover:text-primary transition-colors duration-300">
                             {answer.text}
                           </span>
                           <div className="flex items-center gap-2">
@@ -334,7 +327,7 @@ export default function QuizForm() {
                           </div>
                         </div>
                         {answer.description && (
-                          <p className="text-sm text-muted-foreground mb-2">{answer.description}</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-300 mb-2 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors duration-300">{answer.description}</p>
                         )}
                         {answer.impact && (
                           <Badge 
@@ -362,14 +355,6 @@ export default function QuizForm() {
         className="flex justify-between items-center mt-8 px-4"
       >
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={handleGoHome}
-            className="flex items-center gap-2"
-          >
-            <Home className="w-4 h-4" />
-            Go Home
-          </Button>
           <Button
             variant="outline"
             onClick={handlePrevious}
@@ -410,7 +395,7 @@ export default function QuizForm() {
             <DialogTitle className="text-primary flex items-center gap-2">
               <Info className="w-5 h-5"/> {popupContent.title} Fact
             </DialogTitle>
-            <DialogDescription className="pt-4 text-base text-foreground">
+            <DialogDescription className="pt-4 text-base text-slate-700 dark:text-slate-200">
               {popupContent.description}
             </DialogDescription>
           </DialogHeader>

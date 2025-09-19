@@ -16,68 +16,102 @@ export default function CarbonMolecule3D({ onMoleculeClick }: CarbonMolecule3DPr
 
     const currentMount = mountRef.current;
 
-    // Scene
+    // Scene setup
     const scene = new THREE.Scene();
-
-    // Camera
+    scene.background = new THREE.Color(0x000000); // Black universe background
+    
+    // Camera setup
     const camera = new THREE.PerspectiveCamera(
-      75,
-      currentMount.clientWidth / currentMount.clientHeight,
-      0.1,
+      75, 
+      currentMount.clientWidth / currentMount.clientHeight, 
+      0.1, 
       1000
     );
-    camera.position.z = 5;
+    camera.position.z = 8;
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    // WebGL Renderer setup
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     currentMount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight.position.set(5, 5, 5);
-    scene.add(pointLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight.position.set(5, 5, 5).normalize();
+    scene.add(directionalLight);
 
-    // Molecule Group
+    // Create the molecule
     const molecule = new THREE.Group();
+    scene.add(molecule);
 
-    // Carbon atom
-    const carbonGeometry = new THREE.SphereGeometry(0.7, 32, 32);
-    const carbonMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+    // Atom properties
+    const carbonRadius = 0.7;
+    const oxygenRadius = 0.55;
+    const bondDistance = 1.8;
+    const bondRadius = 0.12;
+    const doubleBondOffset = 0.2;
+
+    // Materials
+    const carbonMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0x282828, 
+      roughness: 0.5, 
+      metalness: 0.2 
+    });
+    const oxygenMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0xcc0000, 
+      roughness: 0.5, 
+      metalness: 0.2 
+    });
+    const bondMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0x888888, 
+      roughness: 0.8, 
+      metalness: 0.1 
+    });
+
+    // Carbon atom (center)
+    const carbonGeometry = new THREE.SphereGeometry(carbonRadius, 32, 32);
     const carbonAtom = new THREE.Mesh(carbonGeometry, carbonMaterial);
     molecule.add(carbonAtom);
 
     // Oxygen atoms
-    const oxygenGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-    const oxygenMaterial = new THREE.MeshStandardMaterial({ color: 0xff4500 });
+    const oxygenGeometry = new THREE.SphereGeometry(oxygenRadius, 32, 32);
+    
     const oxygenAtom1 = new THREE.Mesh(oxygenGeometry, oxygenMaterial);
-    oxygenAtom1.position.set(-1.5, 0.5, 0);
-    const oxygenAtom2 = oxygenAtom1.clone();
-    oxygenAtom2.position.set(1.5, -0.5, 0);
+    oxygenAtom1.position.x = bondDistance;
     molecule.add(oxygenAtom1);
+    
+    const oxygenAtom2 = new THREE.Mesh(oxygenGeometry, oxygenMaterial);
+    oxygenAtom2.position.x = -bondDistance;
     molecule.add(oxygenAtom2);
 
-    // Bonds
-    const bondMaterial = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
-    const bondGeometry1 = new THREE.CylinderGeometry(0.1, 0.1, 1.6, 8);
-    const bond1 = new THREE.Mesh(bondGeometry1, bondMaterial);
-    bond1.position.set(-0.75, 0.25, 0);
-    bond1.lookAt(carbonAtom.position);
-    bond1.rotateX(Math.PI / 2);
+    // Double bonds
+    const bondGeometry = new THREE.CylinderGeometry(bondRadius, bondRadius, bondDistance, 16);
     
-    const bond2 = new THREE.Mesh(bondGeometry1.clone(), bondMaterial);
-    bond2.position.set(0.75, -0.25, 0);
-    bond2.lookAt(carbonAtom.position);
-    bond2.rotateX(Math.PI / 2);
+    // Helper function to create a double bond
+    function createDoubleBond(direction: number) {
+      const bondGroup = new THREE.Group();
+      
+      const bond1 = new THREE.Mesh(bondGeometry, bondMaterial);
+      bond1.position.y = doubleBondOffset / 2;
+      
+      const bond2 = new THREE.Mesh(bondGeometry, bondMaterial);
+      bond2.position.y = -doubleBondOffset / 2;
 
-    molecule.add(bond1);
-    molecule.add(bond2);
+      bondGroup.add(bond1);
+      bondGroup.add(bond2);
+      
+      // Position and orient the bond group
+      bondGroup.position.x = direction * bondDistance / 2;
+      bondGroup.rotation.z = Math.PI / 2; // Rotate to be horizontal
+      
+      molecule.add(bondGroup);
+    }
 
-    scene.add(molecule);
+    createDoubleBond(1);  // Bond to the right oxygen
+    createDoubleBond(-1); // Bond to the left oxygen
 
     // Raycaster for clicks
     const raycaster = new THREE.Raycaster();
@@ -99,8 +133,12 @@ export default function CarbonMolecule3D({ onMoleculeClick }: CarbonMolecule3DPr
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-      molecule.rotation.y += 0.005;
-      molecule.position.y = Math.sin(Date.now() * 0.001) * 0.2;
+      
+      // Faster rotation for more dynamic effect
+      if (molecule) {
+        molecule.rotation.y += 0.01;
+      }
+
       renderer.render(scene, camera);
     };
     animate();
@@ -125,5 +163,11 @@ export default function CarbonMolecule3D({ onMoleculeClick }: CarbonMolecule3DPr
     };
   }, [onMoleculeClick]);
 
-  return <div ref={mountRef} className="w-full h-full cursor-pointer" />;
+  return (
+    <div ref={mountRef} className="w-full h-full cursor-pointer relative">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 text-white text-sm font-semibold text-center z-10">
+        CARBON DIOXIDE 3D Model
+      </div>
+    </div>
+  );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -15,36 +15,55 @@ import Globe3D from "./globe-3d";
 
 export default function LandingContent() {
   const [isPopupOpen, setPopupOpen] = useState(false);
+  const statsRef = useRef<HTMLDivElement | null>(null);
+  const [statsInView, setStatsInView] = useState(false);
+  
+  useEffect(() => {
+    if (!statsRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setStatsInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(statsRef.current);
+    return () => observer.disconnect();
+  }, []);
   
   // Typing effects for climate stats
-  const tempRise = useCountUpFloatEffect(1.1, 2000, 0, 1);
-  const co2Increase = useCountUpEffect(50, 2000, 0);
-  const { displayedText: netZeroTarget, isComplete: netZeroComplete } = useTypingEffect("2050", 100);
-  const parisGoal = useCountUpFloatEffect(1.5, 2000, 0, 1);
+  const tempRise = useCountUpFloatEffect(1.1, 3000, 0, 1);
+  const co2Increase = useCountUpEffect(50, 3000, 0);
+  const { displayedText: netZeroTarget, isComplete: netZeroComplete } = useTypingEffect("2050", 150, statsInView);
+  const parisGoal = useCountUpFloatEffect(1.5, 3000, 0, 1);
   
   // Counting effects for emission percentages
-  const electricityPercent = useCountUpEffect(25, 2000, 0);
-  const transportPercent = useCountUpEffect(14, 2000, 0);
-  const buildingsPercent = useCountUpEffect(6, 2000, 0);
-  const agriculturePercent = useCountUpEffect(24, 2000, 0);
+  const electricityPercent = useCountUpEffect(25, 3000, 0);
+  const transportPercent = useCountUpEffect(14, 3000, 0);
+  const buildingsPercent = useCountUpEffect(6, 3000, 0);
+  const agriculturePercent = useCountUpEffect(24, 3000, 0);
   
   // Counting effects for country footprints
-  const usFootprint = useCountUpFloatEffect(16.5, 2000, 0, 1);
-  const ausFootprint = useCountUpFloatEffect(15.4, 2000, 0, 1);
-  const canFootprint = useCountUpFloatEffect(15.1, 2000, 0, 1);
-  const gerFootprint = useCountUpFloatEffect(9.7, 2000, 0, 1);
-  const ukFootprint = useCountUpFloatEffect(8.5, 2000, 0, 1);
-  const chinaFootprint = useCountUpFloatEffect(7.4, 2000, 0, 1);
-  const brazilFootprint = useCountUpFloatEffect(2.2, 2000, 0, 1);
-  const indiaFootprint = useCountUpFloatEffect(1.9, 2000, 0, 1);
+  const usFootprint = useCountUpFloatEffect(16.5, 3000, 0, 1);
+  const ausFootprint = useCountUpFloatEffect(15.4, 3000, 0, 1);
+  const canFootprint = useCountUpFloatEffect(15.1, 3000, 0, 1);
+  const gerFootprint = useCountUpFloatEffect(9.7, 3000, 0, 1);
+  const ukFootprint = useCountUpFloatEffect(8.5, 3000, 0, 1);
+  const chinaFootprint = useCountUpFloatEffect(7.4, 3000, 0, 1);
+  const brazilFootprint = useCountUpFloatEffect(2.2, 3000, 0, 1);
+  const indiaFootprint = useCountUpFloatEffect(1.9, 3000, 0, 1);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden text-white">
       <div 
-        className="absolute inset-0 bg-gradient-to-b from-background to-primary/10 -z-10"
+        className="absolute inset-0 -z-10"
         style={{
           backgroundImage: "url('/assets/images/bg.jpg')",
-          backgroundSize: "cover",
+          backgroundSize: "contain",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat"
         }}
@@ -55,12 +74,12 @@ export default function LandingContent() {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-xl glass-card p-8 rounded-2xl"
+            className="max-w-xl p-8 rounded-2xl text-white bg-transparent"
           >
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-foreground mb-6 font-headline">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter mb-6 font-headline">
               What's your Ecological Footprint?
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-white/90 mb-8">
               Discover your impact on the planet and get personalized insights to live more sustainably. Your journey to a smaller footprint starts here.
             </p>
             <Link to="/quiz">
@@ -82,11 +101,12 @@ export default function LandingContent() {
       </div>
 
       <motion.div 
+        ref={statsRef}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         transition={{ staggerChildren: 0.2, delayChildren: 0.3 }}
-        className="bg-secondary/50 py-16"
+        className="py-16 text-white bg-transparent"
       >
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl text-left">
           {[
@@ -100,11 +120,11 @@ export default function LandingContent() {
                 hidden: { opacity: 0, y: 50 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
               }}
-              className="flex flex-col items-start p-6 rounded-lg "
+              className="flex flex-col items-start p-6 rounded-lg bg-transparent"
             >
               {feature.icon}
-              <h3 className="text-2xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
+              <h3 className="text-2xl font-bold mb-2 text-white">{feature.title}</h3>
+              <p className="text-white/80">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -112,11 +132,12 @@ export default function LandingContent() {
 
       {/* What is Carbon Footprint Section */}
       <motion.section 
+        id="carbon-footprint"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         transition={{ staggerChildren: 0.2, delayChildren: 0.3 }}
-        className="py-20 bg-background"
+        className="py-20 bg-transparent text-white"
       >
         <div className="container mx-auto px-4">
           <motion.div
@@ -126,10 +147,10 @@ export default function LandingContent() {
             }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               What is a Carbon Footprint?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
               A carbon footprint is the total amount of greenhouse gases (including carbon dioxide and methane) 
               that are generated by our actions. Understanding your footprint is the first step toward reducing it.
             </p>
@@ -159,11 +180,11 @@ export default function LandingContent() {
                   hidden: { opacity: 0, y: 50 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: index * 0.1 } }
                 }}
-                className="text-center p-6 rounded-lg border bg-card/50"
+                className="text-center p-6 rounded-lg bg-transparent border border-white/20"
               >
                 {item.icon}
-                <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="text-muted-foreground">{item.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+                <p className="text-white/80">{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -175,7 +196,7 @@ export default function LandingContent() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="py-20 bg-muted/30"
+        className="py-20 bg-transparent text-white"
       >
         <div className="container mx-auto px-4">
           <motion.div
@@ -185,10 +206,10 @@ export default function LandingContent() {
             }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Why Your Carbon Footprint Matters
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
               Climate change is one of the most pressing challenges of our time, and every individual's choices 
               contribute to the solution or the problem.
             </p>
@@ -201,8 +222,8 @@ export default function LandingContent() {
                 visible: { opacity: 1, x: 0, transition: { duration: 0.6 } }
               }}
             >
-              <h3 className="text-3xl font-bold mb-6 text-foreground">The Science Behind Climate Change</h3>
-              <div className="space-y-4 text-muted-foreground">
+              <h3 className="text-3xl font-bold mb-6">The Science Behind Climate Change</h3>
+              <div className="space-y-4 text-white/80">
                 <p>
                   Greenhouse gases like carbon dioxide trap heat in Earth's atmosphere, creating a "greenhouse effect" 
                   that warms our planet. Since the Industrial Revolution, human activities have increased atmospheric 
@@ -234,7 +255,7 @@ export default function LandingContent() {
                 { icon: <Clock className="w-8 h-8 text-yellow-500" />, stat: netZeroTarget, label: "Net-Zero Target" },
                 { icon: <Target className="w-8 h-8 text-green-500" />, stat: `${parisGoal}°C`, label: "Paris Agreement Goal" }
               ].map((item) => (
-                <div key={item.label} className="text-center p-4 rounded-lg glass-card">
+                <div key={item.label} className="text-center p-4 rounded-lg bg-transparent border border-white/20">
                   {item.icon}
                   <div className="text-2xl font-bold mt-2">
                     {item.label === "Net-Zero Target" ? (
@@ -246,7 +267,7 @@ export default function LandingContent() {
                       item.stat
                     )}
                   </div>
-                  <div className="text-sm text-muted-foreground">{item.label}</div>
+                  <div className="text-sm text-white/80">{item.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -259,7 +280,7 @@ export default function LandingContent() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="py-20 bg-background"
+        className="py-20 bg-transparent text-white"
       >
         <div className="container mx-auto px-4">
           <motion.div
@@ -269,10 +290,10 @@ export default function LandingContent() {
             }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Major Sources of Carbon Emissions
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
               Understanding where emissions come from helps us identify the most impactful changes we can make.
             </p>
           </motion.div>
@@ -310,14 +331,14 @@ export default function LandingContent() {
                   hidden: { opacity: 0, y: 50 },
                   visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: index * 0.1 } }
                 }}
-                className="text-center p-6 rounded-lg glass-card hover:shadow-lg transition-shadow"
+                className="text-center p-6 rounded-lg bg-transparent border border-white/20 hover:shadow-lg transition-shadow"
               >
                 {item.icon}
                 <div className="text-3xl font-bold text-primary mb-2 transition-all duration-300 hover:scale-110">
                   {item.percentage}
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
-                <p className="text-muted-foreground text-sm">{item.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+                <p className="text-white/80 text-sm">{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -329,7 +350,7 @@ export default function LandingContent() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="py-20 bg-muted/30"
+        className="py-20 bg-transparent text-white"
       >
         <div className="container mx-auto px-4">
           <motion.div
@@ -339,10 +360,10 @@ export default function LandingContent() {
             }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Your Individual Impact
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
               While climate change is a global issue, individual actions collectively make a significant difference. 
               Every choice you make contributes to either the problem or the solution.
             </p>
@@ -355,7 +376,7 @@ export default function LandingContent() {
                 visible: { opacity: 1, x: 0, transition: { duration: 0.6 } }
               }}
             >
-              <h3 className="text-3xl font-bold mb-6 text-foreground">The Power of Individual Action</h3>
+              <h3 className="text-3xl font-bold mb-6">The Power of Individual Action</h3>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-1">
@@ -363,7 +384,7 @@ export default function LandingContent() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-2">Collective Impact</h4>
-                    <p className="text-muted-foreground">
+                    <p className="text-white/80">
                       When millions of people make small changes, the cumulative effect can be enormous. 
                       Individual actions can influence policy, business practices, and social norms.
                     </p>
@@ -375,7 +396,7 @@ export default function LandingContent() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-2">Behavioral Change</h4>
-                    <p className="text-muted-foreground">
+                    <p className="text-white/80">
                       Your sustainable choices can inspire others and create a ripple effect in your community, 
                       workplace, and social circles.
                     </p>
@@ -387,7 +408,7 @@ export default function LandingContent() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-2">Market Influence</h4>
-                    <p className="text-muted-foreground">
+                    <p className="text-white/80">
                       Consumer demand drives business decisions. By choosing sustainable products and services, 
                       you're voting with your wallet for a greener economy.
                     </p>
@@ -401,7 +422,7 @@ export default function LandingContent() {
                 hidden: { opacity: 0, x: 50 },
                 visible: { opacity: 1, x: 0, transition: { duration: 0.6, delay: 0.2 } }
               }}
-              className="glass-card p-8 rounded-lg"
+              className="p-8 rounded-lg bg-transparent border border-white/20"
             >
               <h3 className="text-2xl font-bold mb-6 text-center">Average Carbon Footprint by Country</h3>
               <div className="space-y-4">
@@ -418,7 +439,7 @@ export default function LandingContent() {
                   <div key={item.country} className="flex items-center justify-between">
                     <span className="font-medium">{item.country}</span>
                     <div className="flex items-center gap-3">
-                      <div className="w-24 bg-muted rounded-full h-2">
+                      <div className="w-24 bg-white/20 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full ${item.color}`}
                           style={{ width: `${(item.footprint / 16.5) * 100}%` }}
@@ -431,7 +452,7 @@ export default function LandingContent() {
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground mt-4 text-center">
+              <p className="text-sm text-white/80 mt-4 text-center">
                 Tons of CO₂ equivalent per person per year
               </p>
             </motion.div>
@@ -444,7 +465,7 @@ export default function LandingContent() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="py-20 bg-gradient-to-r from-primary/10 to-accent/10"
+        className="py-20 bg-transparent text-white"
       >
         <div className="container mx-auto px-4 text-center">
           <motion.div
@@ -453,10 +474,10 @@ export default function LandingContent() {
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
             }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Ready to Make a Difference?
             </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
               Take our comprehensive quiz to discover your personal carbon footprint and get 
               personalized recommendations to reduce your environmental impact.
             </p>
@@ -466,7 +487,7 @@ export default function LandingContent() {
                 <Footprints className="ml-2 -rotate-90 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <p className="text-sm text-muted-foreground mt-4">
+            <p className="text-sm text-white/80 mt-4">
               Takes about 5 minutes • Completely free • Get instant results
             </p>
           </motion.div>
@@ -479,7 +500,7 @@ export default function LandingContent() {
             <DialogTitle className="text-primary flex items-center gap-2">
               <span className="text-2xl">🌍</span> One Planet Living
             </DialogTitle>
-            <DialogDescription className="pt-4 text-lg text-foreground">
+            <DialogDescription className="pt-4 text-lg text-white">
               For over 50 years, humanity has been in ecological overshoot. This means we demand more from nature than our planet can regenerate in a year. It's time to change that.
             </DialogDescription>
           </DialogHeader>
